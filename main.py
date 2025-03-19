@@ -4,4 +4,9 @@ parser = PageParser("https://www.prospektmaschine.de/hypermarkte/")
 
 print(f'Parser set URL: {parser.get_url()}')
 
-print(parser.get_json_list())
+json_list = parser.get_json_list()
+
+with open("output.json", "w", encoding="utf-8") as f:
+    f.write(json_list)
+
+#print(json_list)
