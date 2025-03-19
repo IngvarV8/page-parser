@@ -1,3 +1,4 @@
+import json
 import requests
 from datetime import datetime
 from bs4 import BeautifulSoup
@@ -9,8 +10,9 @@ class PageParser:
         self.set_html()
         self._target_class = "letak-description"
         
-    def get_list(self):
+    def get_json_list(self):
         soup = BeautifulSoup(self.get_html(), "html.parser")
+        data_list = []  # json objects
         
         for root in soup.find_all("div", "brochure-thumb"): # list of parent objects of each leaflet (root)
             
@@ -24,15 +26,27 @@ class PageParser:
             title = self.get_title(desc)
             name = self.get_shop_name(desc)
             parsed_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                
-            print(f'Title: {title}')
-            print(f'Thumbnail: {thumbnail}')
-            print(f'Shop name: {name}')
-            print(f'Valid from: {valid_from}')
-            print(f'Valid to: {valid_to}')
-            print(f'Parsed time: {parsed_time}')
             
-            print(" ")
+            json_obj = {
+                "title": title,
+                "thumbnail": thumbnail,
+                "shop_name": name,
+                "valid_from": valid_from,
+                "valid_to": valid_to,
+                "parsed_time": parsed_time
+            }
+                
+            #print(f'Title: {title}')
+            #print(f'Thumbnail: {thumbnail}')
+            #print(f'Shop name: {name}')
+            #print(f'Valid from: {valid_from}')
+            #print(f'Valid to: {valid_to}')
+            #print(f'Parsed time: {parsed_time}')
+          
+            data_list.append(json_obj)
+            
+        json_output = json.dumps(data_list, indent=4, ensure_ascii=False)
+        return json_output
         
     def get_url(self):
         return self._url
@@ -54,6 +68,7 @@ class PageParser:
             return target
         except Exception as e:
             print(f"Error finding HTML element {element} with classname {class_name}: {e}")
+            return None
             
     """
     def get_elements(self, parent, element, class_name):
@@ -70,6 +85,7 @@ class PageParser:
             return target
         except Exception as e:
             print(f"Error in get_title: {e}")
+            return None
             
     def get_shop_name(self, parent):
         try:
@@ -77,6 +93,7 @@ class PageParser:
             return target
         except Exception as e:
             print(f"Error in get_shop_name(): {e}")
+            return None
             
     def get_thumbnail(self, parent):
         try:
@@ -84,6 +101,7 @@ class PageParser:
             return target
         except Exception as e:
             print(f"Error in get_shop_name(): {e}")
+            return None
             
     def get_valid_from(self, parent):
         try:
