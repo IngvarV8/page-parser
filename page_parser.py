@@ -62,18 +62,22 @@ class PageParser:
     def _get_shop_name(self, parent):
         try:
             target = parent.find("img").get("alt")
+            if target:
+                words = target.split()
+                # trim "logo" keyword
+                if len(words) > 1 and words[0].lower() == "logo":
+                    return " ".join(words[1:])
             return target
         except Exception as e:
             print(f"Error in get_shop_name(): {e}")
             return None
-            
-    # get requested attribute from provided img element
-    def _get_image_attr(self, parent, attr):
+        
+    def _get_thumbnail(self, parent):
         try:
-            img = parent.find("img")
-            return img.get(attr) if img else None
+            target = parent.find("img")
+            return target.get("data-src") if target else None
         except Exception as e:
-            print(f"Error extracting '{attr}' from <img>: {e}")
+            print(f"Error in _get_thumbnail(): {e}")
             return None
             
     # check if text exists between <> </>
@@ -118,8 +122,8 @@ class PageParser:
 
         return {
             "title": self._get_text(desc, "strong"),
-            "thumbnail": self._get_image_attr(desc, "data-src"),
-            "shop_name": self._get_image_attr(desc, "alt"),
+            "thumbnail": self._get_thumbnail(desc),
+            "shop_name": self._get_shop_name(desc),
             "valid_from": self._get_valid_from(root),
             "valid_to": self._get_valid_to(root),
             "parsed_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
