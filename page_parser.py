@@ -1,4 +1,5 @@
 import json
+import re
 import requests
 from datetime import datetime
 from bs4 import BeautifulSoup
@@ -87,7 +88,11 @@ class PageParser:
     def _get_valid_from(self, parent):
         try:
             date_range = self._get_validity_text(parent)
-            return self._format_date(date_range.split(" - ")[0]) if date_range else None
+            if date_range:
+                dates = re.findall(r"\d{2}\.\d{2}\.\d{4}", date_range)
+                if len(dates) >= 2:  # if <2 dates: it has only expiration date
+                    return self._format_date(dates[0])
+            return None
         except Exception as e:
             print(f"Error in _get_valid_from(): {e}")
             return None
@@ -95,7 +100,11 @@ class PageParser:
     def _get_valid_to(self, parent):
         try:
             date_range = self._get_validity_text(parent)
-            return self._format_date(date_range.split(" - ")[1]) if date_range else None
+            if date_range:
+                dates = re.findall(r"\d{2}\.\d{2}\.\d{4}", date_range)
+                if dates:
+                    return self._format_date(dates[-1])  # -1 = last date
+            return None
         except Exception as e:
             print(f"Error in _get_valid_to(): {e}")
             return None
