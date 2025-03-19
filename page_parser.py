@@ -48,9 +48,6 @@ class PageParser:
             print(f"Error fetching HTML content: {e}")
             self._html = None
     
-    def get_logo(self):
-        pass
-    
     def get_element(self, parent, element, class_name=None):
         try:
             target = parent.find(element, class_=class_name)
@@ -58,19 +55,14 @@ class PageParser:
         except Exception as e:
             print(f"Error finding HTML element {element} with classname {class_name}: {e}")
             
+    """
     def get_elements(self, parent, element, class_name):
         try:
             targets = parent.find_all(element, class_=class_name)
             return targets
         except Exception as e:
-            print(f"Error finding HTML element {element} with classname {class_name}: {e}")
-            
-    def get_img_source(self, parent):
-        try:
-            targets = parent.find("img", attrs={"class": "lazyloadLogo"})
-            return targets
-        except Exception as e:
-            print(f"Error: {e}")
+            print(f"Error finding HTML element {element} with classname {class_name}: {e}")      
+    """
     
     def get_title(self, parent):
         try:
