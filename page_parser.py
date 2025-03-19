@@ -9,6 +9,7 @@ class PageParser:
         self._url = url
         self._html = self._fetch_html()
         
+    # returns complete json list
     def get_json_list(self):
         soup = BeautifulSoup(self.get_html(), "html.parser")
         data_list = []
@@ -24,6 +25,7 @@ class PageParser:
     def get_html(self):
         return self._html
     
+    # send http request and get html content
     def _fetch_html(self):
         try:
             res = requests.get(self.get_url())
@@ -32,6 +34,7 @@ class PageParser:
             print(f"Error fetching HTML content: {e}")
             return None
     
+    # get element inside provided (parent) element
     def _get_element(self, parent, element, class_name=None):
         try:
             target = parent.find(element, class_=class_name)
@@ -39,18 +42,9 @@ class PageParser:
         except Exception as e:
             print(f"Error finding HTML element {element} with classname {class_name}: {e}")
             return None
-            
-    """
-    def get_elements(self, parent, element, class_name):
-        try:
-            targets = parent.find_all(element, class_=class_name)
-            return targets
-        except Exception as e:
-            print(f"Error finding HTML element {element} with classname {class_name}: {e}")      
-    """
     
+    # extract text from given tag
     def _get_text(self, parent, tag):
-        # extract text from given tag
         try:
             return parent.find(tag).get_text() if parent else None
         except Exception as e:
@@ -73,6 +67,7 @@ class PageParser:
             print(f"Error in get_shop_name(): {e}")
             return None
             
+    # get requested attribute from provided img element
     def _get_image_attr(self, parent, attr):
         try:
             img = parent.find("img")
@@ -81,6 +76,7 @@ class PageParser:
             print(f"Error extracting '{attr}' from <img>: {e}")
             return None
             
+    # check if text exists between <> </>
     def _get_validity_text(self, parent):
         element = parent.find("small", class_="hidden-sm")
         return element.get_text() if element else None
@@ -116,6 +112,7 @@ class PageParser:
             print(f"Error in _format_date(): {e}")
             return None
         
+    # returns collected data as json
     def _extract_leaflet_data(self, root):
         desc = self._get_element(root, "div", "letak-description")
 
