@@ -1,4 +1,5 @@
 import requests
+from datetime import datetime
 from bs4 import BeautifulSoup
 
 class PageParser:
@@ -12,7 +13,9 @@ class PageParser:
         soup = BeautifulSoup(self.get_html(), "html.parser")
         
         for root in soup.find_all("div", "brochure-thumb"): # list of parent objects of each leaflet (root)
-            letak_date = self.get_date(root)
+            
+            valid_from = self.get_valid_from(root)
+            valid_to = self.get_valid_to(root)
             
             # description element
             desc = self.get_element(root, "div", "letak-description")
@@ -20,12 +23,14 @@ class PageParser:
             thumbnail = self.get_thumbnail(desc)
             title = self.get_title(desc)
             name = self.get_shop_name(desc)
+            parsed_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 
             print(f'Title: {title}')
             print(f'Thumbnail: {thumbnail}')
             print(f'Shop name: {name}')
-            print(f'Letak date: {letak_date}')
-            
+            print(f'Valid from: {valid_from}')
+            print(f'Valid to: {valid_to}')
+            print(f'Parsed time: {parsed_time}')
             
             print(" ")
         
@@ -88,12 +93,30 @@ class PageParser:
         except Exception as e:
             print(f"Error in get_shop_name(): {e}")
             
-    def get_date(self, parent):
+    def get_valid_from(self, parent):
         try:
-            target = parent.find("small", "hidden-sm").get_text()
-            return target
+            target = parent.find("small", class_="hidden-sm").get_text()
+            valid_from = target.split(" - ")[0]  # extract first date
+            return self.format_date(valid_from)
         except Exception as e:
-            print(f"Error in get_date(): {e}")
-        
+            print(f"Error in get_valid_from(): {e}")
+            return None
+
+    def get_valid_to(self, parent):
+        try:
+            target = parent.find("small", class_="hidden-sm").get_text()
+            valid_to = target.split(" - ")[1]  # extract second date
+            return self.format_date(valid_to)
+        except Exception as e:
+            print(f"Error in get_valid_to(): {e}")
+            return None
+
+    def format_date(self, date_str):
+        """Convert 'DD.MM.YYYY' to 'YYYY-MM-DD' """
+        try:
+            return datetime.strptime(date_str, "%d.%m.%Y").strftime("%Y-%m-%d")
+        except ValueError as e:
+            print(f"Error in format_date(): {e}")
+            return None
         
     
